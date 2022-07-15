@@ -8,7 +8,7 @@
 /**
  * @author Shelton Ngwenya
  * SNo. R00203947
- * 
+ *
  */
 
 /**
@@ -39,7 +39,9 @@
  * Step 3 : Exit
  *
  * Solutions For Plateau
- * Backtrack to one of the previous states and explore other directions
+ * Calc mean direction and carry on in that direction
+ * if we fall out of bounds
+ *      Backtrack to one of the previous states and explore other directions
  */
 
 /**
@@ -161,44 +163,6 @@ void reverse_rows(float (*matrix)[VIEW_SIZE])
 }
 
 /**
- * @brief method to reverse columns in array
- *
- * @param view
- */
-void reverse_cols(float (*matrix)[VIEW_SIZE])
-{
-    printf("COLUMN FLIP------------------------\n");
-
-    printf("BEFORE------------------------------------------------\n");
-    print_view(matrix);
-    printf("------------------------------------------------------\n");
-    // Traverse each column of arr[][]
-    for (int i = 0; i < VIEW_SIZE; i++)
-    {
-        // Initialise start and end index
-        int start = 0;
-        int end = VIEW_SIZE - 1;
-
-        // Till start < end, swap the
-        // element at start and end index
-        while (start < end)
-        {
-            // Swap the element
-            swap(&matrix[start][i], &matrix[end][i]);
-
-            // Increment start and decrement
-            // end for next pair of swapping
-            start++;
-            end--;
-        }
-    }
-
-    printf("AFTER-------------------------------------------------\n");
-    print_view(matrix);
-    printf("------------------------------------------------------\n");
-}
-
-/**
  * @brief method to add traversed path points to path point array
  *
  * @param path_point_array
@@ -239,13 +203,33 @@ path_point get_last_traversed_path_point(path_point *ppa, int *counter)
 {
     int x, y;
     int size = *counter;
-    //printf("Last Point Arr Size (%d)\n", size);
+    // printf("Last Point Arr Size (%d)\n", size);
     path_point last_path_point = {
-        .x = ppa[size-1].x,
-        .y = ppa[size-1].y
-    };
-    //printf("Last point(x='%d', y='%d')\n", last_path_point.x, last_path_point.y);
+        .x = ppa[size - 1].x,
+        .y = ppa[size - 1].y};
+    // printf("Last point(x='%d', y='%d')\n", last_path_point.x, last_path_point.y);
     return last_path_point;
+}
+
+void calc_average_direction(path_point *ppa, int n)
+{
+    float x_mean, y_mean;
+    int x_sum = 0, y_sum = 0;
+    // Take an integer set path points of n values
+
+    // Add all values of path points together
+    for (int i = 0; i < n; i++)
+    {
+        x_sum += ppa->x[i];
+        y_sum += ppa->y[i];
+    }
+
+    // Divide result by n
+    x_mean = x_sum / (float)n;
+    y_mean = y_sum / (float)n;
+    // Result is mean of path points's values
+
+    printf("x_mean = %f, y_mean = %f", x_mean, y_mean);
 }
 
 path_point find_highest_point()
@@ -264,14 +248,17 @@ path_point find_highest_point()
 
     while (true)
     {
-        if (!backtracking){
+        if (!backtracking)
+        {
             counter++;
             generate_view(view, peak.y, peak.x);
-        }else{
+        }
+        else
+        {
             backtracking = 0;
         }
         // printf("View at (x='%d', y='%d')\n", peak.x, peak.y);
-        //print_view(view);
+        // print_view(view);
         center = peak;
         // setting the value at the index of peak to -1 by default
         float peak_value = -1, neighbor_val = 0;
@@ -284,7 +271,7 @@ path_point find_highest_point()
                 if (view[row][col] > peak_value)
                 {
                     peak_value = view[row][col];
-                    neighbor_val = view[row][col + 1];  // warning
+                    neighbor_val = view[row][col + 1]; // warning
                     peak = get_landcape_co_ord(center, col, row);
                     neighbor = get_landcape_co_ord(center, col, row + 1);
                 }
@@ -293,7 +280,7 @@ path_point find_highest_point()
 
         add_traversed_path_point(path_point_array, peak, counter);
 
-        //print_traversed_path_points(path_point_array, counter + 1);
+        // print_traversed_path_points(path_point_array, counter + 1);
 
         if (declare_peak(peak.x, peak.y) == 1)
             return peak;
@@ -306,12 +293,7 @@ path_point find_highest_point()
                 printf("Last point (%d, %d)\n", last_point.x, last_point.y);
                 row = last_point.x;
                 col = last_point.y;
-                //peak = last_point;
-                //center = peak;
-                //peak = get_landcape_co_ord(last_point, last_point.x, last_point.x);
-                //printf("New peek point (%d, %d)\n", peak.x, peak.y);
-                //printf("New peek point (%d, %d)\n", peak.x, peak.y);
-                //reverse_cols(view);
+                
                 generate_view(view, col, row);
                 reverse_rows(view);
                 backtracking = 1;
