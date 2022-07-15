@@ -40,8 +40,7 @@
  *
  * Solutions For Plateau
  * Calc mean direction and carry on in that direction
- * if we fall out of bounds
- *      Backtrack to one of the previous states and explore other directions
+ * Backtrack to one of the previous states and explore other directions
  */
 
 /**
@@ -163,6 +162,44 @@ void reverse_rows(float (*matrix)[VIEW_SIZE])
 }
 
 /**
+ * @brief method to reverse columns in array
+ *
+ * @param view
+ */
+void reverse_cols(float (*matrix)[VIEW_SIZE])
+{
+    printf("COLUMN FLIP------------------------\n");
+
+    printf("BEFORE------------------------------------------------\n");
+    print_view(matrix);
+    printf("------------------------------------------------------\n");
+    // Traverse each column of arr[][]
+    for (int i = 0; i < VIEW_SIZE; i++)
+    {
+        // Initialise start and end index
+        int start = 0;
+        int end = VIEW_SIZE - 1;
+
+        // Till start < end, swap the
+        // element at start and end index
+        while (start < end)
+        {
+            // Swap the element
+            swap(&matrix[start][i], &matrix[end][i]);
+
+            // Increment start and decrement
+            // end for next pair of swapping
+            start++;
+            end--;
+        }
+    }
+
+    printf("AFTER-------------------------------------------------\n");
+    print_view(matrix);
+    printf("------------------------------------------------------\n");
+}
+
+/**
  * @brief method to add traversed path points to path point array
  *
  * @param path_point_array
@@ -220,8 +257,8 @@ void calc_average_direction(path_point *ppa, int n)
     // Add all values of path points together
     for (int i = 0; i < n; i++)
     {
-        x_sum += ppa->x[i];
-        y_sum += ppa->y[i];
+        x_sum += ppa[i].x;
+        y_sum += ppa[i].y;
     }
 
     // Divide result by n
@@ -248,6 +285,7 @@ path_point find_highest_point()
 
     while (true)
     {
+        getchar();
         if (!backtracking)
         {
             counter++;
@@ -293,7 +331,6 @@ path_point find_highest_point()
                 printf("Last point (%d, %d)\n", last_point.x, last_point.y);
                 row = last_point.x;
                 col = last_point.y;
-                
                 generate_view(view, col, row);
                 reverse_rows(view);
                 backtracking = 1;
