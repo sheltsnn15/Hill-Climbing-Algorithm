@@ -248,25 +248,28 @@ path_point get_last_traversed_path_point(path_point *ppa, int *counter)
     return last_path_point;
 }
 
-void calc_average_direction(path_point *ppa, int n)
+void calc_average_direction(path_point *ppa, int n, int *x_mean, int *y_mean)
 {
-    float x_mean, y_mean;
     int x_sum = 0, y_sum = 0;
+
     // Take an integer set path points of n values
+    // printf("\n\n ppa size = %d\n", n);
 
     // Add all values of path points together
     for (int i = 0; i < n; i++)
     {
         x_sum += ppa[i].x;
         y_sum += ppa[i].y;
+        // printf("\n\n x_sum = %d, y_sum = %d\n", x_sum, y_sum);
     }
 
     // Divide result by n
-    x_mean = x_sum / (float)n;
-    y_mean = y_sum / (float)n;
-    // Result is mean of path points's values
+    *x_mean = (int)round(x_sum / (float)n);
+    *y_mean = (int)round(y_sum / (float)n);
 
-    printf("x_mean = %f, y_mean = %f", x_mean, y_mean);
+    // printf("\n\n x_sum = %f, y_sum = %f\n", x_sum / (float)n, y_sum / (float)n);
+    //  Result is mean of path points's values
+    printf("\n\n x_mean = %d, y_mean = %d\n", *x_mean, *y_mean);
 }
 
 path_point find_highest_point()
@@ -277,7 +280,7 @@ path_point find_highest_point()
     path_point center = {.x = VIEW_RADIUS, .y = VIEW_RADIUS};
     // set the peak radius
     path_point peak = center;
-    int counter = 0, row, col;
+    int counter = 0, row, col, x_mean, y_mean;
 
     path_point path_point_array[1000];
     path_point last_point, neighbor;
@@ -324,15 +327,22 @@ path_point find_highest_point()
             return peak;
         else
         {
-            if ((out_of_bonds_check(view, VIEW_SIZE * VIEW_SIZE) == 1) || (compare_neighbor(&peak, &neighbor, peak_value, neighbor_val) == 1))
+            if ((compare_neighbor(&peak, &neighbor, peak_value, neighbor_val) == 1))
             {
+                calc_average_direction(path_point_array, counter, &x_mean, &y_mean);
+                row += x_mean;
+                col += y_mean;
+            }
+            else if (out_of_bonds_check(view, VIEW_SIZE * VIEW_SIZE) == 1)
+            {
+                printf("Last point (x,y)(%d, %d)\n", x_mean, y_mean);
                 last_point = get_last_traversed_path_point(path_point_array, &counter);
                 counter--;
                 printf("Last point (%d, %d)\n", last_point.x, last_point.y);
                 row = last_point.x;
                 col = last_point.y;
                 generate_view(view, col, row);
-                reverse_rows(view);
+                // reverse_rows(view);
                 backtracking = 1;
             }
         }
