@@ -83,6 +83,25 @@ int compare_neighbor(path_point *current, path_point *neighbor, float pv, float 
     }
 }
 
+int comp_neigh(float view[VIEW_SIZE][VIEW_SIZE], path_point center)
+{
+    print_view(view);
+
+    int offsetx[] = {0, 1, 1, 1, 0, -1, -1, -1};
+    int offsety[] = {-1, -1, 0, 1, 1, 1, 0, -1};
+    int center_x = center.x;
+    int center_y = center.y;
+
+    // printf("center = (%d,%d)", center.x, center.y);
+    float sum = view[center_y][center_x];
+    for (int i = 0; i < 8; i++)
+    {
+        int nx = center_x + offsetx[i];
+        int ny = center_y + offsety[i];
+        printf("Yep = %f", sum += view[ny][nx]);
+    }
+}
+
 /**
  * @brief method to check if all points are -1
  *
@@ -266,8 +285,7 @@ path_point calc_average_direction(path_point *ppa, int n)
 
     path_point average = {
         .x = x_mean,
-        .y = y_mean
-    };
+        .y = y_mean};
 
     return average;
 }
@@ -298,10 +316,12 @@ path_point find_highest_point()
         {
             backtracking = 0;
         }
-        print_view(view);
+        // print_view(view);
         center = peak;
         // setting the value at the index of peak to -1 by default
         float peak_value = -1, neighbor_val = 0;
+
+        comp_neigh(view, center);
 
         // looping through view to find largest number and setting it as peak
         for (row = 0; row < VIEW_SIZE; row++)
@@ -327,9 +347,9 @@ path_point find_highest_point()
             if ((compare_neighbor(&peak, &neighbor, peak_value, neighbor_val) == 1))
             {
                 // print_traversed_path_points(path_point_array, counter + 1);
-                row +=5;
-                col +=5;
-                peak = get_landcape_co_ord(center, col, row); 
+                row += 5;
+                col += 5;
+                peak = get_landcape_co_ord(center, col, row);
             }
             if (out_of_bonds_check(view, VIEW_SIZE * VIEW_SIZE) == 1)
             {
