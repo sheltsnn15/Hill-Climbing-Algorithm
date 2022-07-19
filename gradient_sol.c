@@ -240,36 +240,36 @@ path_point get_last_traversed_path_point(path_point *ppa, int *counter)
 {
     int x, y;
     int size = *counter;
-    // printf("Last Point Arr Size (%d)\n", size);
     path_point last_path_point = {
         .x = ppa[size - 1].x,
         .y = ppa[size - 1].y};
-    // printf("Last point(x='%d', y='%d')\n", last_path_point.x, last_path_point.y);
     return last_path_point;
 }
 
-void calc_average_direction(path_point *ppa, int n, int *x_mean, int *y_mean)
+path_point calc_average_direction(path_point *ppa, int n)
 {
+    int x_mean, y_mean;
     int x_sum = 0, y_sum = 0;
 
     // Take an integer set path points of n values
     // printf("\n\n ppa size = %d\n", n);
-
     // Add all values of path points together
     for (int i = 0; i < n; i++)
     {
         x_sum += ppa[i].x;
         y_sum += ppa[i].y;
-        // printf("\n\n x_sum = %d, y_sum = %d\n", x_sum, y_sum);
     }
 
     // Divide result by n
-    *x_mean = (int)round(x_sum / (float)n);
-    *y_mean = (int)round(y_sum / (float)n);
+    x_mean = (int)round(x_sum / (float)n);
+    y_mean = (int)round(y_sum / (float)n);
 
-    // printf("\n\n x_sum = %f, y_sum = %f\n", x_sum / (float)n, y_sum / (float)n);
-    //  Result is mean of path points's values
-    printf("\n\n x_mean = %d, y_mean = %d\n", *x_mean, *y_mean);
+    path_point average = {
+        .x = x_mean,
+        .y = y_mean
+    };
+
+    return average;
 }
 
 path_point find_highest_point()
@@ -298,8 +298,7 @@ path_point find_highest_point()
         {
             backtracking = 0;
         }
-        // printf("View at (x='%d', y='%d')\n", peak.x, peak.y);
-        // print_view(view);
+        print_view(view);
         center = peak;
         // setting the value at the index of peak to -1 by default
         float peak_value = -1, neighbor_val = 0;
@@ -312,7 +311,7 @@ path_point find_highest_point()
                 if (view[row][col] > peak_value)
                 {
                     peak_value = view[row][col];
-                    neighbor_val = view[row][col + 1]; // warning
+                    neighbor_val = view[row][col + 1];
                     peak = get_landcape_co_ord(center, col, row);
                     neighbor = get_landcape_co_ord(center, col, row + 1);
                 }
@@ -321,28 +320,25 @@ path_point find_highest_point()
 
         add_traversed_path_point(path_point_array, peak, counter);
 
-        // print_traversed_path_points(path_point_array, counter + 1);
-
         if (declare_peak(peak.x, peak.y) == 1)
             return peak;
         else
         {
             if ((compare_neighbor(&peak, &neighbor, peak_value, neighbor_val) == 1))
             {
-                calc_average_direction(path_point_array, counter, &x_mean, &y_mean);
-                row += x_mean;
-                col += y_mean;
+                // print_traversed_path_points(path_point_array, counter + 1);
+                row +=5;
+                col +=5;
+                peak = get_landcape_co_ord(center, col, row); 
             }
-            else if (out_of_bonds_check(view, VIEW_SIZE * VIEW_SIZE) == 1)
+            if (out_of_bonds_check(view, VIEW_SIZE * VIEW_SIZE) == 1)
             {
-                printf("Last point (x,y)(%d, %d)\n", x_mean, y_mean);
                 last_point = get_last_traversed_path_point(path_point_array, &counter);
                 counter--;
-                printf("Last point (%d, %d)\n", last_point.x, last_point.y);
                 row = last_point.x;
                 col = last_point.y;
                 generate_view(view, col, row);
-                // reverse_rows(view);
+                reverse_rows(view);
                 backtracking = 1;
             }
         }
