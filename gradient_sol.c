@@ -39,7 +39,7 @@
  * Step 3 : Exit
  *
  * Solutions For Plateau
- * Calc mean direction and carry on in that direction
+ * Take small steps to peak value
  * Backtrack to one of the previous states and explore other directions
  */
 
@@ -73,33 +73,53 @@ int compare_neighbor(path_point *current, path_point *neighbor, float pv, float 
 {
     if (pv == nv)
     {
-        printf("Max %0.2f at (x='%d', y='%d') equals Neighbor %0.2f at (x='%d', y='%d')\n", pv, current->x, current->y, nv, neighbor->x, neighbor->y);
+        //printf("Max %0.2f at (x='%d', y='%d') equals Neighbor %0.2f at (x='%d', y='%d')\n", pv, current->x, current->y, nv, neighbor->x, neighbor->y);
         return 1;
     }
     else
     {
-        printf("Max %0.2f at (x='%d', y='%d') not equals Neighbor %0.2f at (x='%d', y='%d')\n", pv, current->x, current->y, nv, neighbor->x, neighbor->y);
+        //printf("Max %0.2f at (x='%d', y='%d') not equals Neighbor %0.2f at (x='%d', y='%d')\n", pv, current->x, current->y, nv, neighbor->x, neighbor->y);
         return 0;
     }
 }
 
-int comp_neigh(float view[VIEW_SIZE][VIEW_SIZE], path_point center)
+/**
+ * @brief method to compare neighbors close to the view radius
+ *
+ * @param size
+ * @return int
+ */
+int comp_neigh(float (*view)[VIEW_SIZE], int size)
 {
-    print_view(view);
-
+    // arr to store x offsets from view radius
     int offsetx[] = {0, 1, 1, 1, 0, -1, -1, -1};
+    // arr to store y offsets from view radius
     int offsety[] = {-1, -1, 0, 1, 1, 1, 0, -1};
-    int center_x = center.x;
-    int center_y = center.y;
-
-    // printf("center = (%d,%d)", center.x, center.y);
-    float sum = view[center_y][center_x];
+    // get the center of the view
+    int center_x = VIEW_RADIUS;
+    int center_y = VIEW_RADIUS;
+    // loop through the view
     for (int i = 0; i < 8; i++)
     {
+        // get the i'th x offset
         int nx = center_x + offsetx[i];
+        // get the i'th y offset
         int ny = center_y + offsety[i];
-        printf("Yep = %f", sum += view[ny][nx]);
+        // compare each offset value to see if they're equal to any other offset
+        if (view[ny][nx] == view[ny + 1][nx])
+        {
+            // return 1 if true
+            return 1;
+        }
+        // compare each offset value to see if they're equal to any other offset
+        else if (view[ny][nx] == view[ny][nx + 1])
+        {
+            // return 1 if true
+            return 1;
+        }
     }
+
+    // printf("%f", sum);
 }
 
 /**
@@ -148,11 +168,6 @@ void swap(float *a, float *b)
  */
 void reverse_rows(float (*matrix)[VIEW_SIZE])
 {
-    printf("ROWS FLIP------------------------\n");
-
-    printf("BEFORE------------------------------------------------\n");
-    print_view(matrix);
-    printf("------------------------------------------------------\n");
     // Traverse each row of arr[][]
     for (int i = 0; i < VIEW_SIZE; i++)
     {
@@ -175,9 +190,6 @@ void reverse_rows(float (*matrix)[VIEW_SIZE])
             end--;
         }
     }
-    printf("AFTER-------------------------------------------------\n");
-    print_view(matrix);
-    printf("------------------------------------------------------\n");
 }
 
 /**
@@ -187,11 +199,6 @@ void reverse_rows(float (*matrix)[VIEW_SIZE])
  */
 void reverse_cols(float (*matrix)[VIEW_SIZE])
 {
-    printf("COLUMN FLIP------------------------\n");
-
-    printf("BEFORE------------------------------------------------\n");
-    print_view(matrix);
-    printf("------------------------------------------------------\n");
     // Traverse each column of arr[][]
     for (int i = 0; i < VIEW_SIZE; i++)
     {
@@ -212,10 +219,6 @@ void reverse_cols(float (*matrix)[VIEW_SIZE])
             end--;
         }
     }
-
-    printf("AFTER-------------------------------------------------\n");
-    print_view(matrix);
-    printf("------------------------------------------------------\n");
 }
 
 /**
@@ -265,31 +268,6 @@ path_point get_last_traversed_path_point(path_point *ppa, int *counter)
     return last_path_point;
 }
 
-path_point calc_average_direction(path_point *ppa, int n)
-{
-    int x_mean, y_mean;
-    int x_sum = 0, y_sum = 0;
-
-    // Take an integer set path points of n values
-    // printf("\n\n ppa size = %d\n", n);
-    // Add all values of path points together
-    for (int i = 0; i < n; i++)
-    {
-        x_sum += ppa[i].x;
-        y_sum += ppa[i].y;
-    }
-
-    // Divide result by n
-    x_mean = (int)round(x_sum / (float)n);
-    y_mean = (int)round(y_sum / (float)n);
-
-    path_point average = {
-        .x = x_mean,
-        .y = y_mean};
-
-    return average;
-}
-
 path_point find_highest_point()
 {
     // view
@@ -306,7 +284,7 @@ path_point find_highest_point()
 
     while (true)
     {
-        getchar();
+        // getchar();
         if (!backtracking)
         {
             counter++;
@@ -320,8 +298,6 @@ path_point find_highest_point()
         center = peak;
         // setting the value at the index of peak to -1 by default
         float peak_value = -1, neighbor_val = 0;
-
-        comp_neigh(view, center);
 
         // looping through view to find largest number and setting it as peak
         for (row = 0; row < VIEW_SIZE; row++)
@@ -344,13 +320,7 @@ path_point find_highest_point()
             return peak;
         else
         {
-            if ((compare_neighbor(&peak, &neighbor, peak_value, neighbor_val) == 1))
-            {
-                // print_traversed_path_points(path_point_array, counter + 1);
-                row += 5;
-                col += 5;
-                peak = get_landcape_co_ord(center, col, row);
-            }
+
             if (out_of_bonds_check(view, VIEW_SIZE * VIEW_SIZE) == 1)
             {
                 last_point = get_last_traversed_path_point(path_point_array, &counter);
@@ -360,6 +330,14 @@ path_point find_highest_point()
                 generate_view(view, col, row);
                 reverse_rows(view);
                 backtracking = 1;
+            }
+
+            if ((compare_neighbor(&peak, &neighbor, peak_value, neighbor_val) == 1))
+            {
+                // print_traversed_path_points(path_point_array, counter + 1);
+                row += 5;
+                col += 5;
+                peak = get_landcape_co_ord(center, col, row);
             }
         }
     }
