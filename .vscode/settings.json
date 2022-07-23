@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "array": "c",
-        "string.h": "c"
+        "string.h": "c",
+        "random": "c"
     }
 }

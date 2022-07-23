@@ -344,7 +344,7 @@ int main()
     int i;
 
     res =  performance_eval();
-    //res = single_run(5);
+    //res = single_run(27);
     // print_matrix();
     // for (i=0;i<queries_made;i++)
     //     printf("%d-%d\n", user_path[i].y, user_path[i].x);
