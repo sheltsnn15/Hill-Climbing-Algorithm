@@ -46,7 +46,7 @@
  *
  * Backtrack to one of the previous states and explore other directions
  * (Still busy with this implemetation)
- * (Seeds/mountains struggling with: 27 = 276 average calls,
+ * (Seeds/landscapes struggling with: 27 = 276 average calls,
  *                                   92 = 1002 average calls,
  *                                   97 = 1002 average calls)
  */
