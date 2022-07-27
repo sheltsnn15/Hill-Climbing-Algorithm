@@ -7,7 +7,6 @@
 
 /**
  * @author Shelton Ngwenya
- * SNo. R00203947
  *
  */
 
@@ -39,13 +38,21 @@
  * Step 3 : Exit
  *
  * Solutions For Plateau
- * Take small steps to peak value
- *      Look at previous paths taken
- *      Sum the differences between all x coordinates and y coordinates visited
- *      Average out those differences and return this as the average direction
- *
- * Backtrack to one of the previous states and explore other directions
- * (Still busy with this implemetation)
+ * Solution 1:
+ *      Take small steps to peak value
+ *              Look at previous paths taken
+ *              Sum the differences between all x coordinates and y coordinates visited
+ *              Average out those differences and return this as the average direction
+ * Solution 2:
+ *      Backtrack to one of the previous states and explore other directions (Still busy with this implementation)
+ *      Visit all corners of the view
+ *      Look for a value greater than the current peak
+ *      if not found
+ *          backtrack
+ *          Explore another direction
+ *      else
+ *          go to step 1 
+ *      
  * (Seeds/landscapes struggling with: 27 = 276 average calls,
  *                                   92 = 1002 average calls,
  *                                   97 = 1002 average calls)
